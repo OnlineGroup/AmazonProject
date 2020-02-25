@@ -39,32 +39,34 @@ public class Project extends TestBase{
         page.t2XLarge.click();
         page.saveAndClose.click();
         page.discriptionEC2Instance.get(4).sendKeys("T2 Linux XtraLarge");
-        page.estimateMonthlyBill.click();
-//        System.out.println(page.estimateMonthlyBill.getText());
-//        System.out.println(page.monthlyCosts.get(0).getText().substring(2));
-////        double sumOfMonthlyCosts =0;
-////         for(int i=0; i < page.monthlyCosts.size(); i++){
-////            sumOfMonthlyCosts += Double.parseDouble(page.monthlyCosts.get(i).getText().substring(2));
-//
-//        }
-//         System.out.println(sumOfMonthlyCosts);
-//         double actualEstimatedCost = Double.parseDouble(page.estimateMonthlyBill.getText().substring(33).replace(")",""));
 
-//         Assert.assertEquals(sumOfMonthlyCosts,actualEstimatedCost);
+        double sum=AmazonPages.getTotalMonthlyCost(page.monthlyCosts);
+
+        page.estimateMonthlyBill.click();
+        Double monthlyBill=Double.parseDouble(AmazonPages.getNumber(page.estimateMonthlyBill));
+        softAssert.assertEquals(monthlyBill,sum);
+
+        softAssert.assertAll();
+
         page.serviceTab.click();
-        for (WebElement select : page.selectUsage) {
-            Select st = new Select(select);
-            st.selectByVisibleText("Hours/Week");
-        }
+
+
+
+
+        Select st=new Select(page.selectUsage.get(3));
+        st.selectByVisibleText("Hours/Week");
+
         page.estimateMonthlyBill.click();
         page.saveAndShare.click();
         page.nameInput.sendKeys("EC2Test Configuration");
         page.includesInput.sendKeys("Includes 5 EC2 Instances");
         page.okButton.click();
         driver.get(page.saveUrl.getAttribute("href"));
-        System.out.println(page.monthlyCostAws.getText());
+        System.out.println("1 "+page.monthlyCostAws.getText());
         double AWSCalcResult = Double.parseDouble(page.monthlyCostAws.getText().substring(2));
+        System.out.println("2 "+AWSCalcResult);
         double estimatedCostPrice = Double.parseDouble(page.estimateMonthlyBill.getText().substring(2));
+        System.out.println("3 "+estimatedCostPrice);
         Assert.assertEquals(AWSCalcResult, estimatedCostPrice);
 
     }
